@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GeoShield | Smart Security Monitor</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🛡️ GeoShield
+        </div>
+
+        <a href="/login" class="nav-button">
+            Login
+        </a>
+
+    </nav>
+
+
+    <main class="hero">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                🔐 SMART SECURITY MONITOR
+            </div>
+
+            <h1>
+                Protect Your Digital World
+                <span>with GeoShield</span>
+            </h1>
+
+            <p>
+                Monitor authorized device activity, detect unusual
+                security events, visualize locations and understand
+                account risks from one intelligent dashboard.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="/login" class="primary-button">
+                    Open Security Dashboard →
+                </a>
+
+                <a href="#features" class="secondary-button">
+                    Explore Features
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="security-card">
+
+            <div class="card-header">
+                <span>Security Status</span>
+                <span class="status-dot">●</span>
+            </div>
+
+            <div class="shield-icon">
+                🛡️
+            </div>
+
+            <h2>System Protected</h2>
+
+            <p>
+                Your authorized security activity is being monitored.
+            </p>
+
+            <div class="mini-stats">
+
+                <div>
+                    <strong>98%</strong>
+                    <small>Safety Score</small>
+                </div>
+
+                <div>
+                    <strong>24/7</strong>
+                    <small>Monitoring</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <section id="features" class="features">
+
+        <h2>Security Features</h2>
+
+        <p class="section-subtitle">
+            Everything you need for a simple security monitoring demo.
+        </p>
+
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <h3>Location Monitoring</h3>
+                <p>
+                    View locations that you explicitly authorize
+                    through your browser.
+                </p>
+            </div>
+
+
+            <div class="feature-card">
+                <div class="feature-icon">🚨</div>
+                <h3>Suspicious Activity</h3>
+                <p>
+                    Identify unusual login locations, new devices
+                    and repeated failed attempts.
+                </p>
+            </div>
+
+
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Device Tracking</h3>
+                <p>
+                    Keep a record of authorized device activity
+                    for your security dashboard.
+                </p>
+            </div>
+
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Risk Analysis</h3>
+                <p>
+                    Understand security events using simple
+                    Low, Medium and High risk levels.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        <p>
+            © 2026 GeoShield | Cybersecurity Academic Project
+        </p>
+
+        <p>
+            Built with Flask + SQLite + JavaScript
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

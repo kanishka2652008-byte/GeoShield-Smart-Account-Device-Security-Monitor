@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>GeoShield | Dashboard</title>
+
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+
+    <!-- Leaflet Map -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+</head>
+
+
+<body class="dashboard-page">
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            🛡️ GeoShield
+        </div>
+
+
+        <div class="nav-right">
+
+            <span class="user-email">
+                {{ email }}
+            </span>
+
+            <a href="/logout" class="logout-button">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- DASHBOARD -->
+
+    <main class="dashboard-container">
+
+
+        <div class="dashboard-title">
+
+            <div>
+
+                <div class="badge">
+                    SECURITY CENTER
+                </div>
+
+                <h1>
+                    Security Dashboard
+                </h1>
+
+                <p>
+                    Monitor authorized activity and security events.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STAT CARDS -->
+
+        <div class="stats-grid">
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🔐
+                </div>
+
+                <div>
+
+                    <span>Security Score</span>
+
+                    <strong id="securityScore">
+                        85%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚨
+                </div>
+
+                <div>
+
+                    <span>High Risk Events</span>
+
+                    <strong id="highRisk">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📱
+                </div>
+
+                <div>
+
+                    <span>Devices</span>
+
+                    <strong id="deviceCount">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📊
+                </div>
+
+                <div>
+
+                    <span>Total Events</span>
+
+                    <strong id="eventCount">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ACTION BUTTONS -->
+
+        <div class="action-bar">
+
+            <button
+                class="primary-button"
+                onclick="generateDemoEvents()"
+            >
+                ⚡ Generate Demo Activity
+            </button>
+
+
+            <button
+                class="secondary-button"
+                onclick="shareLocation()"
+            >
+                📍 Share My Location
+            </button>
+
+        </div>
+
+
+
+        <!-- MAP -->
+
+        <section class="dashboard-card">
+
+            <div class="card-title">
+
+                <div>
+
+                    <h2>
+                        🌍 Activity Map
+                    </h2>
+
+                    <p>
+                        Authorized location visualization
+                    </p>
+
+                </div>
+
+                <span class="live-label">
+                    ● LIVE
+                </span>
+
+            </div>
+
+
+            <div id="map"></div>
+
+        </section>
+
+
+
+        <!-- SECURITY EVENTS -->
+
+        <section class="dashboard-card">
+
+            <div class="card-title">
+
+                <div>
+
+                    <h2>
+                        🛡️ Security Events
+                    </h2>
+
+                    <p>
+                        Recent account and device activity
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="events-container">
+
+                <div class="loading">
+                    Loading security events...
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+
+    <script
+        src="{{ url_for('static', filename='map.js') }}">
+    </script>
+
+
+    <script
+        src="{{ url_for('static', filename='script.js') }}">
+    </script>
+
+
+</body>
+
+</html>
