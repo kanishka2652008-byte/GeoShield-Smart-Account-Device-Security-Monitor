@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>GeoShield | Create Account</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body class="login-page">
+
+    <div class="login-container">
+
+        <div class="login-logo">
+            🛡️
+        </div>
+
+        <h1>Create Account</h1>
+
+        <p>
+            Create your GeoShield security account.
+        </p>
+
+
+        {% if error %}
+
+        <div class="error-message">
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Minimum 6 characters"
+                required
+            >
+
+
+            <label>Confirm Password</label>
+
+            <input
+                type="password"
+                name="confirm_password"
+                placeholder="Re-enter your password"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="primary-button login-button"
+            >
+                Create Account →
+            </button>
+
+        </form>
+
+
+        <p style="margin-top: 25px;">
+
+            Already have an account?
+
+            <a href="/login"
+               class="back-link"
+               style="display:inline;">
+                Login
+            </a>
+
+        </p>
+
+
+        <a href="/" class="back-link">
+            ← Back to Home
+        </a>
+
+    </div>
+
+</body>
+
+</html>
