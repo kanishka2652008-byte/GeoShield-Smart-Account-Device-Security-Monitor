@@ -2,10 +2,9 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 import sqlite3
 from datetime import datetime
 import random
-import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-
 app.secret_key = "geoshield-demo-secret-key"
 
 DATABASE = "geoshield.db"
@@ -20,6 +19,7 @@ def get_db():
 
 
 def init_db():
+
     conn = get_db()
 
     conn.execute("""
@@ -41,25 +41,29 @@ def init_db():
         )
     """)
 
-    # Demo user
-    existing_user = conn.execute(
+    # Create demo account
+    demo = conn.execute(
         "SELECT * FROM users WHERE email = ?",
         ("demo@geoshield.com",)
     ).fetchone()
 
-    if not existing_user:
+    if not demo:
+
+        hashed_password = generate_password_hash("demo123")
+
         conn.execute(
             "INSERT INTO users (email, password) VALUES (?, ?)",
-            ("demo@geoshield.com", "demo123")
+            ("demo@geoshield.com", hashed_password)
         )
 
-    # Add initial demo events if database is empty
+    # Demo security events
     count = conn.execute(
         "SELECT COUNT(*) FROM security_events"
     ).fetchone()[0]
 
     if count == 0:
-        demo_events = [
+
+        events = [
             (
                 "Normal Login",
                 "Chennai, India",
@@ -92,7 +96,8 @@ def init_db():
             )
         ]
 
-        for event in demo_events:
+        for event in events:
+
             conn.execute("""
                 INSERT INTO security_events
                 (event_type, location, device, risk, timestamp)
@@ -123,21 +128,28 @@ def login():
 
     if request.method == "POST":
 
-        email = request.form.get("email")
-        password = request.form.get("password")
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
 
         conn = get_db()
 
         user = conn.execute(
-            "SELECT * FROM users WHERE email = ? AND password = ?",
-            (email, password)
+            "SELECT * FROM users WHERE email = ?",
+            (email,)
         ).fetchone()
 
         conn.close()
 
-        if user:
+        if user and check_password_hash(
+            user["password"],
+            password
+        ):
+
             session["user"] = email
-            return redirect(url_for("dashboard"))
+
+            return redirect(
+                url_for("dashboard")
+            )
 
         return render_template(
             "login.html",
@@ -147,13 +159,98 @@ def login():
     return render_template("login.html")
 
 
+# ---------------- REGISTER ----------------
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    if request.method == "POST":
+
+        email = request.form.get(
+            "email", ""
+        ).strip().lower()
+
+        password = request.form.get(
+            "password", ""
+        )
+
+        confirm_password = request.form.get(
+            "confirm_password", ""
+        )
+
+        # Check email
+        if not email:
+
+            return render_template(
+                "register.html",
+                error="Please enter your email."
+            )
+
+        # Check password
+        if len(password) < 6:
+
+            return render_template(
+                "register.html",
+                error="Password must contain at least 6 characters."
+            )
+
+        # Check passwords
+        if password != confirm_password:
+
+            return render_template(
+                "register.html",
+                error="Passwords do not match."
+            )
+
+        conn = get_db()
+
+        existing_user = conn.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+
+        if existing_user:
+
+            conn.close()
+
+            return render_template(
+                "register.html",
+                error="An account with this email already exists."
+            )
+
+        # Hash password
+        hashed_password = generate_password_hash(
+            password
+        )
+
+        conn.execute(
+            """
+            INSERT INTO users (email, password)
+            VALUES (?, ?)
+            """,
+            (email, hashed_password)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return redirect(
+            url_for("login")
+        )
+
+    return render_template("register.html")
+
+
 # ---------------- DASHBOARD ----------------
 
 @app.route("/dashboard")
 def dashboard():
 
     if "user" not in session:
-        return redirect(url_for("login"))
+
+        return redirect(
+            url_for("login")
+        )
 
     return render_template(
         "dashboard.html",
@@ -168,16 +265,21 @@ def logout():
 
     session.clear()
 
-    return redirect(url_for("home"))
+    return redirect(
+        url_for("home")
+    )
 
 
-# ---------------- GET EVENTS ----------------
+# ---------------- EVENTS ----------------
 
 @app.route("/api/events")
 def get_events():
 
     if "user" not in session:
-        return jsonify({"error": "Unauthorized"}), 401
+
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
 
     conn = get_db()
 
@@ -192,6 +294,7 @@ def get_events():
     result = []
 
     for event in events:
+
         result.append({
             "id": event["id"],
             "event_type": event["event_type"],
@@ -210,14 +313,32 @@ def get_events():
 def add_event():
 
     if "user" not in session:
-        return jsonify({"error": "Unauthorized"}), 401
+
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
 
     data = request.get_json()
 
-    event_type = data.get("event_type", "Unknown Activity")
-    location = data.get("location", "Unknown")
-    device = data.get("device", "Unknown Device")
-    risk = data.get("risk", "Low")
+    event_type = data.get(
+        "event_type",
+        "Unknown Activity"
+    )
+
+    location = data.get(
+        "location",
+        "Unknown"
+    )
+
+    device = data.get(
+        "device",
+        "Unknown Device"
+    )
+
+    risk = data.get(
+        "risk",
+        "Low"
+    )
 
     conn = get_db()
 
@@ -230,25 +351,29 @@ def add_event():
         location,
         device,
         risk,
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
     ))
 
     conn.commit()
     conn.close()
 
     return jsonify({
-        "success": True,
-        "message": "Security event added"
+        "success": True
     })
 
 
-# ---------------- GENERATE DEMO EVENTS ----------------
+# ---------------- DEMO EVENTS ----------------
 
 @app.route("/api/demo-events", methods=["POST"])
 def demo_events():
 
     if "user" not in session:
-        return jsonify({"error": "Unauthorized"}), 401
+
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
 
     locations = [
         "Chennai, India",
@@ -293,15 +418,16 @@ def demo_events():
             random.choice(locations),
             random.choice(devices),
             random.choice(risks),
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
         ))
 
     conn.commit()
     conn.close()
 
     return jsonify({
-        "success": True,
-        "message": "Demo security events generated"
+        "success": True
     })
 
 
@@ -311,7 +437,10 @@ def demo_events():
 def save_location():
 
     if "user" not in session:
-        return jsonify({"error": "Unauthorized"}), 401
+
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
 
     data = request.get_json()
 
@@ -319,6 +448,7 @@ def save_location():
     longitude = data.get("longitude")
 
     if latitude is None or longitude is None:
+
         return jsonify({
             "error": "Location data missing"
         }), 400
@@ -334,7 +464,9 @@ def save_location():
         f"{latitude:.5f}, {longitude:.5f}",
         "User Browser",
         "Low",
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
     ))
 
     conn.commit()
@@ -347,15 +479,16 @@ def save_location():
     })
 
 
-# ---------------- START APP ----------------
+# ---------------- START ----------------
 
 if __name__ == "__main__":
+
     init_db()
 
     print("\n===================================")
-    print("        GEOSHIELD SECURITY APP")
+    print("       GEOSHIELD SECURITY APP")
     print("===================================")
-    print("Demo Login:")
+    print("Demo Account:")
     print("Email: demo@geoshield.com")
     print("Password: demo123")
     print("===================================\n")
